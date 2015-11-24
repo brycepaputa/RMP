@@ -12,6 +12,8 @@ def main():
     xtrain = xtrain.append(xvalid, ignore_index=True)
     xtrain = xtrain.drop(['tid', 'date', 'id', xtrain.columns[0]], axis=1)
     
+    xtrain = xtrain.apply(lambda x: (x-np.mean(x))/np.std(x), axis = 0, raw=True)
+    
     helpfulness = xtrain['helpfulness'].get_values()
     clarity = xtrain['clarity'].get_values()[:,0]
     easiness = xtrain['easiness'].get_values()
@@ -20,6 +22,7 @@ def main():
     xtrain = xtrain.drop(['helpfulness', 'clarity', 'easiness', 'quality'], axis=1)
     n = len(xtrain.iloc[0,:])
     helpfulnessCorr = []
+    
     for i in range(n):
         helpfulnessCorr.append(np.correlate(xtrain.iloc[:,i].get_values(), helpfulness)[0])
     clarityCorr = []
