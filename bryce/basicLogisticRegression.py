@@ -5,8 +5,8 @@ import theano
 from theano import tensor as T
 
 def resumeLogisticRegression(xtrain, ytrain, xvalid, yvalid, xtest, numSteps, trainingRate = .1, alpha = .001):
-    w = theano.shared(np.loadtxt('../w.csv', dtype=theano.config.floatX), name='w', borrow=True)
-    b = theano.shared(np.loadtxt('../b.csv', dtype=theano.config.floatX), name='b', borrow=True)
+    w = theano.shared(np.loadtxt('w.csv', dtype=theano.config.floatX), name='w', borrow=True)
+    b = theano.shared(np.loadtxt('b.csv', dtype=theano.config.floatX), name='b', borrow=True)
     return logisticRegression(xtrain, ytrain, xvalid, yvalid, xtest, numSteps, trainingRate, alpha, w, b)
 
 
@@ -55,9 +55,9 @@ def main():
     #1000 epochs = 30 min
     
     ytest = pd.Series(ytest, index=xtest.iloc[:,1])
-    ytest.to_csv('../result.csv')
-    np.savetxt('../w.csv', w)
-    np.savetxt('../b.csv', b)
+    ytest.to_csv('result.csv')
+    np.savetxt('w.csv', w)
+    np.savetxt('b.csv', b)
     return ytest
 
 #def test():

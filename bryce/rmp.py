@@ -33,7 +33,7 @@ def fixIndices(data):#xtrain, ytrain, xtest):
             data[i].index = data[i].index - data[i].index[0]
     return data
 
-def cleanData(xtrain, ytrain, xvalid, yvalid, xtest):
+def cleanData(xtrain, ytrain, xvalid, yvalid, xtest, keepQuality=False):
     #['id', 'tid', 'dept', 'date', 'forcredit', 'attendance',
     #       'textbookuse', 'interest', 'grade', 'tags', 'comments', 'helpcount',
     #       'nothelpcount', 'online', 'profgender', 'profhotness',
@@ -120,6 +120,9 @@ def cleanData(xtrain, ytrain, xvalid, yvalid, xtest):
     xvalid.to_csv('xvalid_clean.csv')
     yvalid.to_csv('yvalid_clean.csv')
     xtest.to_csv('xtest_clean.csv')
+    if not keepQuality:
+        xtrain.drop(['helpfulness', 'clarity', 'easiness', 'quality'], axis=1, inplace=True)
+        xvalid.drop(['helpfulness', 'clarity', 'easiness', 'quality'], axis=1, inplace=True)
     return xtrain, ytrain, xvalid, yvalid, xtest
 
 def vectorizeWords(xtrain, xvalid, xtest):    
@@ -143,11 +146,14 @@ def vectorizeWords(xtrain, xvalid, xtest):
     
     return (xtrain, xvalid, xtest, countVect)
 
-def readCleanData():
+def readCleanData(keepQuality=False):
     xtrain = pd.read_csv('xtrain_clean.csv')
     ytrain = pd.read_csv('ytrain_clean.csv', header=None, index_col=0)
     xvalid = pd.read_csv('xvalid_clean.csv')
     yvalid = pd.read_csv('yvalid_clean.csv', header=None, index_col=0)
+    if not keepQuality:
+        xtrain.drop(['helpfulness', 'clarity', 'easiness', 'quality'], axis=1, inplace=True)
+        xvalid.drop(['helpfulness', 'clarity', 'easiness', 'quality'], axis=1, inplace=True)
     ytrain = ytrain[ytrain.columns[0]]
     yvalid = yvalid[yvalid.columns[0]]
     xtest = pd.read_csv('xtest_clean.csv')
@@ -158,7 +164,6 @@ def readData():
     xtrain = pd.read_csv('train.csv')
     xtest = pd.read_csv('test.csv')
     ytrain = xtrain.quality-2
-    xtrain.drop(['helpfulness', 'clarity', 'easiness', 'quality'], axis=1, inplace=True)
     nvalid = len(xtrain)/4
     xvalid = xtrain[0:nvalid]
     xtrain = xtrain[nvalid:]
@@ -169,14 +174,14 @@ def readData():
     
 
 def main():
-#    xtrain, ytrain, xvalid, yvalid, xtest = readData()
-#    xtrain, ytrain, xvalid, yvalid, xtest = cleanData(xtrain, ytrain, xvalid, yvalid, xtest)
-    xtrain, ytrain, xvalid, yvalid, xtest = readCleanData()
+    xtrain, ytrain, xvalid, yvalid, xtest = readData()
+    xtrain, ytrain, xvalid, yvalid, xtest = cleanData(xtrain, ytrain, xvalid, yvalid, xtest)
+#    xtrain, ytrain, xvalid, yvalid, xtest = readCleanData()
 #    xtrain = xtrain[0:30000]
 #    ytrain = ytrain[0:30000]
     xtrain, xvalid, xtest, countVect = vectorizeWords(xtrain, xvalid, xtest)
     
-    ytest, w, b = resumeLogisticRegression(xtrain, ytrain, xvalid, yvalid, xtest, 1000)
+    ytest, w, b = resumeLogisticRegression(xtrain, ytrain, xvalid, yvalid, xtest, 1)
     #1000 epochs = 30 min
     
     ytest = pd.Series(ytest, index=xtest.iloc[:,1])
