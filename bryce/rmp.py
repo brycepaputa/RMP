@@ -8,6 +8,17 @@ import pandas as pd
 from sklearn.feature_extraction.text import CountVectorizer
 from basicLogisticRegression import *
 
+def shuffle(df1, df2=None):
+    index = list(df1.index)
+    random.shuffle(index)
+    df1 = df1.ix[index]
+    df1.reset_index()
+    if df2 != None:
+        df2 = df2.ix[index]
+        df2.reset_index()
+        return df1, df2
+    return df1
+
 def indicatorMap(x, value):
     return (1 if str(x).lower() == str(value).lower() else 0)
 
@@ -162,7 +173,9 @@ def readCleanData(keepQuality=False):
 
 def readData():
     xtrain = pd.read_csv('train.csv')
+    shuffle(xtrain)
     xtest = pd.read_csv('test.csv')
+    shuffle(xtest)
     ytrain = xtrain.quality-2
     nvalid = len(xtrain)/4
     xvalid = xtrain[0:nvalid]

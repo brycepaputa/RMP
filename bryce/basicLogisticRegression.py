@@ -14,6 +14,9 @@ def logisticRegression(xtrain, ytrain, xvalid, yvalid, xtest, numSteps, training
     xtrain = xtrain.drop(['tid', 'date', 'id', xtrain.columns[0]], axis=1)
     xvalid = xvalid.drop(['tid', 'date', 'id', xvalid.columns[0]], axis=1)
     xtest = xtest.drop(['tid', 'date', 'id', xtest.columns[0]], axis=1)
+    if 'quality' in xtrain.columns:
+        xtrain = xtrain.drop(['helpfulness', 'clarity', 'easiness', 'quality'], axis=1)
+        xvalid = xvalid.drop(['helpfulness', 'clarity', 'easiness', 'quality'], axis=1)
     x = T.matrix('x')
     y = T.ivector('y')
     if w == None or b == None:
@@ -51,14 +54,14 @@ def main():
 #    ytrain = ytrain[0:30000]
     xtrain, xvalid, xtest, countVect = rmp.vectorizeWords(xtrain, xvalid, xtest)
     
-    ytest, w, b = rmp.resumeLogisticRegression(xtrain, ytrain, xvalid, yvalid, xtest, 1000)
+    ytest, w, b = resumeLogisticRegression(xtrain, ytrain, xvalid, yvalid, xtest, 1)
     #1000 epochs = 30 min
     
     ytest = pd.Series(ytest, index=xtest.iloc[:,1])
     ytest.to_csv('result.csv')
     np.savetxt('w.csv', w)
     np.savetxt('b.csv', b)
-    return ytest
+    return xtrain, ytrain, xvalid, yvalid, xtest, ytest
 
 #def test():
 #    xtr, ytr, xte = readCleanData()
